@@ -1,0 +1,11 @@
+<library path="cyberdog_rviz2_control_plugin">
+  <class
+    name="cyberdog_rviz2_control_plugin/MissionPanel"
+    type="cyberdog_rviz2_control_plugin::MissionPanel"
+    base_class_type="rviz_common::Panel"
+  >
+    <description>
+      Panel for control and display of status for Iron Ball.
+    </description>
+  </class>
+</library>
