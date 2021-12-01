@@ -4,7 +4,7 @@
 
 SwitchButton::SwitchButton(QWidget* parent, Style style)
   : QWidget(parent)
-  , _value(true)
+  , _value(false)
   , _duration(100)
   , _enabled(true)
 {

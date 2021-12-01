@@ -3,13 +3,27 @@
 
 
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
+
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
 #include <rviz_common/panel.hpp>
 #include <rviz_common/config.hpp>
+// #include <string>
+
+#include <QPainter>
+#include <QLineEdit>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <string>
+#include <QTimer>
+#include <QPixmap>
+
+#include "motion_msgs/action/change_mode.hpp"
+#include "motion_msgs/action/change_gait.hpp"
+
+#include "switch.h"
+#include "teleop_button.h"
 
 class QLineEdit;
 namespace cyberdog_rviz2_control_plugin
@@ -24,26 +38,24 @@ public:
   virtual void load( const rviz_common::Config& config );
   virtual void save( rviz_common::Config config ) const;
   
-
-
-  void setMissionStatus(const std::string text);
-
-  // Here we declare some internal slots.
 protected Q_SLOTS:
   void trigger_service(bool msg, std::string service_name);
+  void trigger_action(bool state);
+
 protected:
-  // One-line text editor for displaying the mission status.
-  QLineEdit* output_status_editor_;
+  bool event(QEvent *event);
 
-  // The current name of the output topic.
-  QString output_status_;
-  QVBoxLayout* layout;
-  QHBoxLayout* iconlayout;
-  QLabel* label;
+private:
+  std::shared_ptr<DummyNode> dummy_node_;
 
+  rclcpp_action::Client<motion_msgs::action::ChangeMode>::SharedPtr mode_client_;
+  rclcpp_action::Client<motion_msgs::action::ChangeGait>::SharedPtr gait_client_;
   QString icon_on_path_;
   QString icon_off_path_;
-  
+  TeleopButton* teleop_button_;
+  SwitchButton* switch_button_;
+  QPushButton* mode_button_;
+  QLabel* label_;
   
 };
 

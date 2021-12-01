@@ -2,9 +2,9 @@
 #ifndef TELEOP_WIDGET_H
 #define TELEOP_WIDGET_H
 
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <rviz/panel.h>
-#include <geometry_msgs/Twist.h>
+#include "motion_msgs/msg/se3_velocity_cmd.hpp"
 
 #include <QWidget>
 #include <QPushButton>
@@ -18,8 +18,16 @@
 #include <QKeyEvent>
 #include <QEvent>
 
-namespace escooter_control_panel
+namespace cyberdog_rviz2_control_plugin
 {
+
+class DummyNode : public rclcpp::Node
+{
+public:
+    DummyNode():Node("dummy_node"){};
+    ~DummyNode(){};
+};
+
 class TeleopButton : public QGridLayout
 {
 Q_OBJECT
@@ -52,16 +60,19 @@ private:
 
     void set_vel(const char &key);
 
-    // QLineEdit output_topic_editor_;
     QComboBox cmd_topic_box_;
     QPushButton discover_topic_;
     std::vector<QString> cmd_topic_list_;
 
-    ros::NodeHandle nh_;
-    ros::Publisher velocity_publisher_;
+    rclcpp::Publisher<motion_msgs::msg::SE3VelocityCMD>::SharedPtr cmd_pub_;
 
-    double linear_velocity_, target_linear_velocity_;
-    double angular_velocity_, target_angular_velocity_;
+    double linear_velocity_;
+    double target_linear_velocity_;
+    double angular_velocity_;
+    double target_angular_velocity_;
+    bool cmd_topic_selected_ = false;
+    std::shared_ptr<DummyNode> dummy_node_;
+    
 };
 
 }

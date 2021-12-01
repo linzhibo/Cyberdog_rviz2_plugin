@@ -1,3 +1,5 @@
 # Cyberdog rviz2 plugin
 
-on going...
+## Preview
+
+![coke](readme_pics/preview.gif)

@@ -16,10 +16,13 @@ find_package(ament_cmake REQUIRED)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(Qt5 COMPONENTS Widgets Core REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(std_msgs REQUIRED)
+
+find_package(motion_msgs REQUIRED)
 
 include_directories(include)
 
@@ -30,10 +33,11 @@ set(CMAKE_AUTOMOC ON)
 add_library(${PROJECT_NAME} SHARED
             src/mission_panel.cpp
             src/switch.cpp
+            src/teleop_button.cpp
 )
 
 # Link ament packages
-ament_target_dependencies(${PROJECT_NAME} rclcpp rviz_common)
+ament_target_dependencies(${PROJECT_NAME} rclcpp rviz_common rclcpp_action motion_msgs)
 
 # Link non ament packages
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)

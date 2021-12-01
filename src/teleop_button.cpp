@@ -1,18 +1,21 @@
 #include "teleop_button.h"
 
-namespace escooter_control_panel
+namespace cyberdog_rviz2_control_plugin
 {
-TeleopButton::TeleopButton(QWidget *parent)
+TeleopButton::TeleopButton(QWidget*)
     : QGridLayout(),
+    v_label_("speed(m/s)"),
+    w_label_("steer(rad/s)"),
     bt_q_("↖"), bt_w_("↑"), bt_e_("↗"),
     bt_a_("←"), bt_s_("STOP"), bt_d_("→"),
     bt_z_("↙"), bt_x_("↓"), bt_c_("↘"),
     discover_topic_("Detect"),
     target_linear_velocity_(1.0),
-    target_angular_velocity_(0.5),
-    v_label_("speed(m/s)"),
-    w_label_("steer(rad/s)")
+    target_angular_velocity_(0.5)
+    
 {
+    dummy_node_ = std::make_shared<DummyNode>();
+
     this->addWidget(&discover_topic_, 0, 0);
     this->addWidget(&cmd_topic_box_, 0, 1);
 
@@ -135,12 +138,20 @@ void TeleopButton::set_vel(const char &key)
 
 void TeleopButton::send_vel()
 {
-    geometry_msgs::Twist twist;
-    twist.linear.x = linear_velocity_;
-    twist.angular.z = angular_velocity_;
-    if(ros::ok() && velocity_publisher_)
+    motion_msgs::msg::SE3VelocityCMD cmd_vel_msg;
+    cmd_vel_msg.velocity.timestamp = dummy_node_->now();
+    cmd_vel_msg.sourceid = 2;
+    cmd_vel_msg.velocity.frameid.id = 1;
+    cmd_vel_msg.velocity.linear_x = linear_velocity_;
+    cmd_vel_msg.velocity.linear_y = 0;
+    cmd_vel_msg.velocity.linear_z = 0;
+
+    cmd_vel_msg.velocity.angular_x = 0;
+    cmd_vel_msg.velocity.angular_y = 0;
+    cmd_vel_msg.velocity.angular_z = angular_velocity_;
+    if(cmd_topic_selected_)
     {
-        velocity_publisher_.publish(twist);
+        cmd_pub_->publish(cmd_vel_msg);
     }
 }
 
@@ -152,49 +163,25 @@ void TeleopButton::update_topic(int pos)
 
 void TeleopButton::discover_topics()
 {
-    std::string allowed_topic = "geometry_msgs/Twist";
-
-    XmlRpc::XmlRpcValue params("ros_topic_list");
-    XmlRpc::XmlRpcValue results;
-    XmlRpc::XmlRpcValue r;
+    std::string allowed_topic = "motion_msgs/msg/SE3VelocityCMD";
 
     cmd_topic_list_.clear();
     cmd_topic_list_.emplace_back(" ");
 
-    // this method can get all topics, https://gist.github.com/bechu/6222399
-    if(ros::master::execute("getTopicTypes", params, results, r, false) == true)
+    auto topics_and_types = dummy_node_->get_topic_names_and_types();
+    for (auto it : topics_and_types)
     {
-        if(results.getType() == XmlRpc::XmlRpcValue::TypeArray)
+        for (auto type: it.second)
         {
-            int32_t i = 2;
-            if(results[i].getType() == XmlRpc::XmlRpcValue::TypeArray)
-            {
-                for (int32_t j = 0; j < results[i].size(); ++j)
-                {
-                    if(results[i][j].getType() == XmlRpc::XmlRpcValue::TypeArray)
-                    {
-                        if(results[i][j].size() == 2)
-                        {
-                            if(results[i][j][0].getType() == XmlRpc::XmlRpcValue::TypeString
-                            && results[i][j][1].getType() == XmlRpc::XmlRpcValue::TypeString)
-                            {
-                                std::string topic = static_cast<std::string>(results[i][j][0]);
-                                std::string type = static_cast<std::string>(results[i][j][1]);
-
-                                if (type == allowed_topic)
-                                {
-                                    cmd_topic_list_.emplace_back(QString::fromStdString(topic));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+           if (type == allowed_topic)
+           {
+               cmd_topic_list_.emplace_back(QString::fromStdString(it.first));
+           }
         }
     }
 
     cmd_topic_box_.clear();
-    for (int pos =0; pos < cmd_topic_list_.size(); pos++)
+    for (size_t pos =0; pos < cmd_topic_list_.size(); pos++)
     {
         cmd_topic_box_.addItem(cmd_topic_list_[pos]);
     }
@@ -204,15 +191,15 @@ void TeleopButton::setTopic( const QString& topic )
 {
     if( topic == "" || topic == " " )
     {
-        std::cout<<"velocity_publisher_.shutdown() "<<std::endl;
-        velocity_publisher_.shutdown();
+        cmd_topic_selected_ = false;
     }
     else
     {
         try
         {
-            velocity_publisher_ = nh_.advertise<geometry_msgs::Twist>( topic.toStdString(), 1 );
+            cmd_pub_ = dummy_node_->create_publisher<motion_msgs::msg::SE3VelocityCMD>(topic.toStdString(), rclcpp::SystemDefaultsQoS());
             std::cout<<"set velocity topic to: "<< topic.toStdString()<<std::endl;
+            cmd_topic_selected_ = true;
         }
         catch (...)
         {
