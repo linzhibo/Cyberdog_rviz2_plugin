@@ -2,4 +2,4 @@
 
 ## Preview
 
-![coke](readme_pics/preview.gif)
+![preview](readme_pics/preview.gif)
