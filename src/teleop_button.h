@@ -68,6 +68,7 @@ private:
 
     double linear_velocity_;
     double target_linear_velocity_;
+    double lateral_velocity_;
     double angular_velocity_;
     double target_angular_velocity_;
     bool cmd_topic_selected_ = false;

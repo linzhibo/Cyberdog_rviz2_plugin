@@ -21,7 +21,7 @@ find_package(rviz_common REQUIRED)
 find_package(Qt5 COMPONENTS Widgets Core REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(std_msgs REQUIRED)
-
+find_package(std_srvs REQUIRED)
 find_package(motion_msgs REQUIRED)
 
 include_directories(include)
@@ -34,10 +34,11 @@ add_library(${PROJECT_NAME} SHARED
             src/mission_panel.cpp
             src/switch.cpp
             src/teleop_button.cpp
+            src/gait_combo_box.cpp
 )
 
 # Link ament packages
-ament_target_dependencies(${PROJECT_NAME} rclcpp rviz_common rclcpp_action motion_msgs)
+ament_target_dependencies(${PROJECT_NAME} rclcpp rviz_common rclcpp_action motion_msgs std_srvs)
 
 # Link non ament packages
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)

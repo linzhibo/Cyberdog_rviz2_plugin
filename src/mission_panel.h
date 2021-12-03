@@ -4,12 +4,12 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
+#include <std_srvs/srv/set_bool.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
 #include <rviz_common/panel.hpp>
 #include <rviz_common/config.hpp>
-// #include <string>
 
 #include <QPainter>
 #include <QLineEdit>
@@ -24,6 +24,7 @@
 
 #include "switch.h"
 #include "teleop_button.h"
+#include "gait_combo_box.h"
 
 class QLineEdit;
 namespace cyberdog_rviz2_control_plugin
@@ -40,7 +41,8 @@ public:
   
 protected Q_SLOTS:
   void trigger_service(bool msg, std::string service_name);
-  void trigger_action(bool state);
+  void set_mode(int mode_id);
+  void set_gait(int gait_id);
 
 protected:
   bool event(QEvent *event);
@@ -50,13 +52,17 @@ private:
 
   rclcpp_action::Client<motion_msgs::action::ChangeMode>::SharedPtr mode_client_;
   rclcpp_action::Client<motion_msgs::action::ChangeGait>::SharedPtr gait_client_;
+
   QString icon_on_path_;
   QString icon_off_path_;
   TeleopButton* teleop_button_;
-  SwitchButton* switch_button_;
-  QPushButton* mode_button_;
+  SwitchButton* camera_switch_button_;
+  QPushButton* stand_up_button_;
+  QPushButton* get_down_button_;
   QLabel* label_;
+  GaitComboBox* gait_list_;
   
+  std::string srv_name_camera_ = "camera/enable";
 };
 
 } //namespace cyberdog_rviz2_control_plugin

@@ -4,11 +4,11 @@ namespace cyberdog_rviz2_control_plugin
 {
 TeleopButton::TeleopButton(QWidget*)
     : QGridLayout(),
-    v_label_("speed(m/s)"),
-    w_label_("steer(rad/s)"),
+    v_label_("linear(m/s)"),
+    w_label_("angular(rad/s)"),
     bt_q_("↖"), bt_w_("↑"), bt_e_("↗"),
-    bt_a_("←"), bt_s_("STOP"), bt_d_("→"),
-    bt_z_("↙"), bt_x_("↓"), bt_c_("↘"),
+    bt_a_("↶"), bt_s_("STOP"), bt_d_("↷"),
+    bt_z_("←"), bt_x_("↓"), bt_c_("→"),
     discover_topic_("Detect"),
     target_linear_velocity_(1.0),
     target_angular_velocity_(0.5)
@@ -132,8 +132,11 @@ void TeleopButton::set_angular_speed(double value)
 
 void TeleopButton::set_vel(const char &key)
 {
-    linear_velocity_ = target_linear_velocity_ * ((key == 'q') + (key == 'w') + (key == 'e') + -1*(key == 'z') + -1*(key == 'x') + -1*(key == 'c'));
-    angular_velocity_ = target_angular_velocity_ * ((key == 'q') + (key == 'a') + (key == 'z') + -1*(key == 'e') + -1*(key == 'd') + -1*(key == 'c'));
+    linear_velocity_ = target_linear_velocity_ * ((key == 'q') + (key == 'w') + (key == 'e') + -1*(key == 'x'));
+    lateral_velocity_ = target_linear_velocity_ * ((key == 'z') + -1*(key == 'c'));
+
+    angular_velocity_ = target_angular_velocity_ * ((key == 'q') + (key == 'a') + -1*(key == 'e') + -1*(key == 'd'));
+    
 }
 
 void TeleopButton::send_vel()
@@ -143,7 +146,7 @@ void TeleopButton::send_vel()
     cmd_vel_msg.sourceid = 2;
     cmd_vel_msg.velocity.frameid.id = 1;
     cmd_vel_msg.velocity.linear_x = linear_velocity_;
-    cmd_vel_msg.velocity.linear_y = 0;
+    cmd_vel_msg.velocity.linear_y = lateral_velocity_;
     cmd_vel_msg.velocity.linear_z = 0;
 
     cmd_vel_msg.velocity.angular_x = 0;
