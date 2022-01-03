@@ -62,7 +62,7 @@ private:
   QLabel* label_;
   GaitComboBox* gait_list_;
   
-  std::string srv_name_camera_ = "camera/enable";
+  std::string srv_name_camera_ = "/mi1046017/camera/enable";
 };
 
 } //namespace cyberdog_rviz2_control_plugin

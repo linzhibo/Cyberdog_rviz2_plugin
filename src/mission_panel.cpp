@@ -11,8 +11,8 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   icon_off_path_ = QString::fromStdString(ament_index_cpp::get_package_share_directory("cyberdog_rviz2_control_plugin") + "/data/cd_off_64.jpg");
   icon_on_path_ = QString::fromStdString(ament_index_cpp::get_package_share_directory("cyberdog_rviz2_control_plugin") + "/data/cd_on_64.jpg");
 
-  mode_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeMode>(dummy_node_,"checkout_mode");
-  gait_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeGait>(dummy_node_,"checkout_gait");
+  mode_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeMode>(dummy_node_,"/mi1046017/checkout_mode");
+  gait_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeGait>(dummy_node_,"/mi1046017/checkout_gait");
 
   //interface 
   QVBoxLayout* layout = new QVBoxLayout;
@@ -23,14 +23,14 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   label_->setPixmap(pic);
   mode_box_layout->addWidget(label_);
 
-  camera_switch_button_ = new SwitchButton(this, SwitchButton::Style::EMPTY);
-  camera_switch_button_->setServiceName(srv_name_camera_);
+  // camera_switch_button_ = new SwitchButton(this, SwitchButton::Style::EMPTY);
+  // camera_switch_button_->setServiceName(srv_name_camera_);
   stand_up_button_ = new QPushButton("Stand Up");
   get_down_button_ = new QPushButton("Get Down");
 
   mode_box_layout->addWidget(stand_up_button_);
   mode_box_layout->addWidget(get_down_button_);
-  mode_box_layout->addWidget(camera_switch_button_);
+  // mode_box_layout->addWidget(camera_switch_button_);
 
   gait_list_ = new GaitComboBox(this);
   teleop_button_ = new TeleopButton(this);
@@ -40,7 +40,7 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   layout->addLayout( teleop_button_ );
   setLayout( layout );
 
-  connect( camera_switch_button_, SIGNAL(valueChanged(bool, std::string) ), this, SLOT( trigger_service(bool, std::string)));
+  // connect( camera_switch_button_, SIGNAL(valueChanged(bool, std::string) ), this, SLOT( trigger_service(bool, std::string)));
   connect(gait_list_,SIGNAL(valueChanged(int)),SLOT(set_gait(int)));
   connect(stand_up_button_, &QPushButton::clicked, [this](void) { set_mode(1); });
   connect(get_down_button_, &QPushButton::clicked, [this](void) { set_mode(0); });
@@ -52,7 +52,7 @@ void MissionPanel::set_gait(int gait_id)
 
   auto goal = motion_msgs::action::ChangeGait::Goal();
   goal.motivation = 253;
-  goal.gaitstamped.timestamp = dummy_node_->now();
+  goal.gaitstamped.timestamp = dummy_node_->get_clock()->now();
   goal.gaitstamped.gait = gait_id;
   auto goal_handle = gait_client_->async_send_goal(goal);
 }
@@ -70,10 +70,10 @@ void MissionPanel::set_mode(int mode_id)
     std::cerr<<"Unable to find mode action server" << std::endl;
     return;
   }
-  auto mode = mode_id>0? motion_msgs::msg::Mode::MODE_MANUAL:motion_msgs::msg::Mode::MODE_DEFAULT;
-  std::cout<<"mode: "<< (mode_id>0? "MANUAL":"DEFAULT " ) <<std::endl;
+  uint8_t mode = mode_id>0? motion_msgs::msg::Mode::MODE_MANUAL:motion_msgs::msg::Mode::MODE_DEFAULT;
+  std::cout<<"mode: "<< (mode>0? "MANUAL":"DEFAULT " ) <<std::endl;
   auto goal = motion_msgs::action::ChangeMode::Goal();
-  goal.modestamped.timestamp = dummy_node_->now();
+  goal.modestamped.timestamp = dummy_node_->get_clock()->now();
   goal.modestamped.control_mode = mode;
 
   auto send_goal_options = rclcpp_action::Client<motion_msgs::action::ChangeMode>::SendGoalOptions();
