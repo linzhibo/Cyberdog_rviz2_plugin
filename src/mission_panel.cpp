@@ -14,6 +14,7 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
 
   mode_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeMode>(dummy_node_, dogs_namespace_ + "checkout_mode");
   gait_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeGait>(dummy_node_, dogs_namespace_ + "checkout_gait");
+  para_pub_ = dummy_node_->create_publisher<motion_msgs::msg::Parameters>(dogs_namespace_ + "para_change", rclcpp::SensorDataQoS());
 
   //interface 
   QVBoxLayout* layout = new QVBoxLayout;
@@ -34,17 +35,37 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   // mode_box_layout->addWidget(camera_switch_button_);
 
   gait_list_ = new GaitComboBox(this);
+
+    //teleop layout
+  QGroupBox *teleop_group_box = new QGroupBox(tr("🕹 Teleop layout"));
   teleop_button_ = new TeleopButton(this);
+  // teleop_group_box->setLayout(teleop_button_);
+
+  height_slider_ = new QSlider(Qt::Vertical);
+  height_slider_->setMinimum(20);
+  height_slider_->setMaximum(40);
+  height_slider_->setValue(30);
+  QHBoxLayout* teleop_layout = new QHBoxLayout;
+  teleop_layout->addLayout(teleop_button_);
+  teleop_layout->addWidget(height_slider_);
+  teleop_group_box->setLayout(teleop_layout);
   
+  //main layout
   layout->addLayout( mode_box_layout );
   layout->addLayout( gait_list_ );
-  layout->addLayout( teleop_button_ );
+  layout->addWidget( teleop_group_box );
   setLayout( layout );
 
   // connect( camera_switch_button_, SIGNAL(valueChanged(bool, std::string) ), this, SLOT( trigger_service(bool, std::string)));
   connect(gait_list_,SIGNAL(valueChanged(int)),SLOT(set_gait(int)));
   connect(stand_up_button_, &QPushButton::clicked, [this](void) { set_mode(1); });
   connect(get_down_button_, &QPushButton::clicked, [this](void) { set_mode(0); });
+  connect(height_slider_,SIGNAL(valueChanged(int)),SLOT(set_height(int)));
+}
+
+void MissionPanel::set_height(int height)
+{
+  std::cout<<height<<std::endl;
 }
 
 void MissionPanel::discover_dogs_ns()

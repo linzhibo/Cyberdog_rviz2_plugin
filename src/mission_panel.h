@@ -13,6 +13,7 @@
 
 #include <QPainter>
 #include <QLineEdit>
+#include <QGroupBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -21,6 +22,8 @@
 
 #include "motion_msgs/action/change_mode.hpp"
 #include "motion_msgs/action/change_gait.hpp"
+#include "motion_msgs/action/ext_mon_order.hpp"
+#include "motion_msgs/msg/parameters.hpp"
 
 #include "switch.h"
 #include "teleop_button.h"
@@ -54,6 +57,7 @@ private:
 
   rclcpp_action::Client<motion_msgs::action::ChangeMode>::SharedPtr mode_client_;
   rclcpp_action::Client<motion_msgs::action::ChangeGait>::SharedPtr gait_client_;
+  rclcpp::Publisher<motion_msgs::msg::Parameters>::SharedPtr para_pub_;
 
   QString icon_on_path_;
   QString icon_off_path_;
@@ -63,6 +67,7 @@ private:
   QPushButton* get_down_button_;
   QLabel* label_;
   GaitComboBox* gait_list_;
+  QSlider* height_slider_;
   
   std::string srv_name_camera_ = "camera/enable";
   std::string dogs_namespace_ = "/mi1046017/";
