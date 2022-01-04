@@ -19,10 +19,10 @@ TeleopButton::TeleopButton(QWidget*)
     this->addWidget(&discover_topic_, 0, 0);
     this->addWidget(&cmd_topic_box_, 0, 1);
 
-    linear_speed_box_.setRange(0, 2.0);
+    linear_speed_box_.setRange(0, 3.0);
     linear_speed_box_.setValue(target_linear_velocity_);
     linear_speed_box_.setSingleStep(0.1);
-    angular_speed_box_.setRange(0, 1.0);
+    angular_speed_box_.setRange(0, 2.0);
     angular_speed_box_.setValue(target_angular_velocity_);
     angular_speed_box_.setSingleStep(0.1);
     this->addWidget(&v_label_, 1, 0);

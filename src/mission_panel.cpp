@@ -6,13 +6,14 @@ namespace cyberdog_rviz2_control_plugin
 MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
 {
   dummy_node_ = std::make_shared<DummyNode>();
+  discover_dogs_ns();
   setFocusPolicy(Qt::ClickFocus);
 
   icon_off_path_ = QString::fromStdString(ament_index_cpp::get_package_share_directory("cyberdog_rviz2_control_plugin") + "/data/cd_off_64.jpg");
   icon_on_path_ = QString::fromStdString(ament_index_cpp::get_package_share_directory("cyberdog_rviz2_control_plugin") + "/data/cd_on_64.jpg");
 
-  mode_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeMode>(dummy_node_,"/mi1046017/checkout_mode");
-  gait_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeGait>(dummy_node_,"/mi1046017/checkout_gait");
+  mode_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeMode>(dummy_node_, dogs_namespace_ + "checkout_mode");
+  gait_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeGait>(dummy_node_, dogs_namespace_ + "checkout_gait");
 
   //interface 
   QVBoxLayout* layout = new QVBoxLayout;
@@ -44,6 +45,26 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   connect(gait_list_,SIGNAL(valueChanged(int)),SLOT(set_gait(int)));
   connect(stand_up_button_, &QPushButton::clicked, [this](void) { set_mode(1); });
   connect(get_down_button_, &QPushButton::clicked, [this](void) { set_mode(0); });
+}
+
+void MissionPanel::discover_dogs_ns()
+{
+  std::string allowed_topic = "motion_msgs/msg/SE3VelocityCMD";
+  auto topics_and_types = dummy_node_->get_topic_names_and_types();
+  for (auto it : topics_and_types)
+  {
+    for (auto type: it.second)
+    {
+      if (type == allowed_topic)
+      {
+          std::string topic_name = it.first;
+          topic_name = topic_name.erase(0,1);
+          dogs_namespace_ = '/' + topic_name.substr(0, topic_name.find('/')+1);
+          std::cout<<"Found mi dog's namespace: "<< dogs_namespace_ << std::endl;
+          return;
+      }
+    }
+  }
 }
 
 void MissionPanel::set_gait(int gait_id)

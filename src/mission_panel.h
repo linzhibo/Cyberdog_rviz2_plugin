@@ -43,11 +43,13 @@ protected Q_SLOTS:
   void trigger_service(bool msg, std::string service_name);
   void set_mode(int mode_id);
   void set_gait(int gait_id);
+  void set_height(int height);
 
 protected:
   bool event(QEvent *event);
 
 private:
+  void discover_dogs_ns();
   std::shared_ptr<DummyNode> dummy_node_;
 
   rclcpp_action::Client<motion_msgs::action::ChangeMode>::SharedPtr mode_client_;
@@ -62,7 +64,8 @@ private:
   QLabel* label_;
   GaitComboBox* gait_list_;
   
-  std::string srv_name_camera_ = "/mi1046017/camera/enable";
+  std::string srv_name_camera_ = "camera/enable";
+  std::string dogs_namespace_ = "/mi1046017/";
 };
 
 } //namespace cyberdog_rviz2_control_plugin
