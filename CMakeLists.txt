@@ -51,6 +51,9 @@ install(TARGETS ${PROJECT_NAME}
   )
 install(DIRECTORY data
  DESTINATION share/${PROJECT_NAME})
+install(
+DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/icons"
+DESTINATION "share/${PROJECT_NAME}")
 
 pluginlib_export_plugin_description_file(rviz_common plugins_description.xml)
 
