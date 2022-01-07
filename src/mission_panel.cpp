@@ -5,7 +5,7 @@ namespace cyberdog_rviz2_control_plugin
 {
 MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
 {
-  dummy_node_ = std::make_shared<DummyNode>();
+  dummy_node_ = std::make_shared<DummyNode>("panel_dummy_node");
   discover_dogs_ns();
   setFocusPolicy(Qt::ClickFocus);
 
@@ -27,9 +27,14 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
 
   // camera_switch_button_ = new SwitchButton(this, SwitchButton::Style::EMPTY);
   // camera_switch_button_->setServiceName(srv_name_camera_);
+  dog_switch_button_ = new SwitchButton(this, SwitchButton::Style::EMPTY);
+  dog_switch_button_->setValue(false);
   stand_up_button_ = new QPushButton("Stand Up");
+  stand_up_button_->setEnabled(false);
   get_down_button_ = new QPushButton("Get Down");
+  get_down_button_->setEnabled(false);
 
+  mode_box_layout->addWidget(dog_switch_button_);
   mode_box_layout->addWidget(stand_up_button_);
   mode_box_layout->addWidget(get_down_button_);
   // mode_box_layout->addWidget(camera_switch_button_);
@@ -57,10 +62,29 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   setLayout( layout );
 
   // connect( camera_switch_button_, SIGNAL(valueChanged(bool, std::string) ), this, SLOT( trigger_service(bool, std::string)));
+  connect( dog_switch_button_, SIGNAL(valueChanged(bool) ), this, SLOT( set_dog_status(bool)));
   connect(gait_list_,SIGNAL(valueChanged(int)),SLOT(set_gait(int)));
   connect(stand_up_button_, &QPushButton::clicked, [this](void) { set_mode(1); });
   connect(get_down_button_, &QPushButton::clicked, [this](void) { set_mode(0); });
   connect(height_slider_,SIGNAL(valueChanged(int)),SLOT(set_height(int)));
+}
+
+void MissionPanel::set_dog_status(bool msg)
+{
+  if(msg)
+  {
+    std::cout<< "set_dog_status "<< msg <<std::endl;
+    label_->setPixmap(QPixmap(icon_on_path_));
+    stand_up_button_->setEnabled(true);
+    get_down_button_->setEnabled(true);
+  }
+  else
+  {
+    std::cout<< "set_dog_status "<< msg <<std::endl;
+    label_->setPixmap(QPixmap(icon_off_path_));
+    stand_up_button_->setEnabled(false);
+    get_down_button_->setEnabled(false);
+  }
 }
 
 void MissionPanel::set_height(int height)
@@ -86,6 +110,7 @@ void MissionPanel::discover_dogs_ns()
       }
     }
   }
+  std::cout<<"Did nod found mi dog's namespace, default: "<< dogs_namespace_ << std::endl;
 }
 
 void MissionPanel::set_gait(int gait_id)
@@ -107,7 +132,7 @@ bool MissionPanel::event(QEvent *event)
 
 void MissionPanel::set_mode(int mode_id)
 {
-  if (!mode_client_->wait_for_action_server(std::chrono::seconds(1)))
+  if (!mode_client_->wait_for_action_server(std::chrono::milliseconds(500)))
   {
     std::cerr<<"Unable to find mode action server" << std::endl;
     return;
@@ -124,8 +149,6 @@ void MissionPanel::set_mode(int mode_id)
     if (result.result->succeed) 
     {
       std::cout<<"Changed mode to "<< (mode_id>0? "MANUAL":"DEFAULT " )<< std::endl;
-      QPixmap pic(mode_id>0 ? icon_on_path_:icon_off_path_);
-      label_->setPixmap(pic);
     } 
     else 
     { 

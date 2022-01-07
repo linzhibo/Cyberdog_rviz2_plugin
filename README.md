@@ -17,3 +17,6 @@ export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 rviz2
 ```
  Panels -> Add new panel -> mission panel
+
+ ## Cyberdog icon creator credit
+ ![Icon creator](readme_pics/icon_creator.jpg)

@@ -17,6 +17,7 @@
 #include <QComboBox>
 #include <QKeyEvent>
 #include <QEvent>
+#include <QHBoxLayout>
 
 namespace cyberdog_rviz2_control_plugin
 {
@@ -24,7 +25,7 @@ namespace cyberdog_rviz2_control_plugin
 class DummyNode : public rclcpp::Node
 {
 public:
-    DummyNode():Node("dummy_node"){};
+    DummyNode(std::string node_name):Node(node_name){};
     ~DummyNode(){};
 };
 

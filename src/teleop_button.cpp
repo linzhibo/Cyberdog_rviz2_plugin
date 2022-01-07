@@ -14,7 +14,7 @@ TeleopButton::TeleopButton(QWidget*)
     target_angular_velocity_(0.5)
     
 {
-    dummy_node_ = std::make_shared<DummyNode>();
+    dummy_node_ = std::make_shared<DummyNode>("teleop_dummy_node");
 
     this->addWidget(&discover_topic_, 0, 0);
     this->addWidget(&cmd_topic_box_, 0, 1);
@@ -25,10 +25,12 @@ TeleopButton::TeleopButton(QWidget*)
     angular_speed_box_.setRange(0, 2.0);
     angular_speed_box_.setValue(target_angular_velocity_);
     angular_speed_box_.setSingleStep(0.1);
-    this->addWidget(&v_label_, 1, 0);
-    this->addWidget(&linear_speed_box_, 1, 1);
-    this->addWidget(&w_label_, 1, 2);
-    this->addWidget(&angular_speed_box_, 1, 3);
+    QHBoxLayout* l1 = new QHBoxLayout;
+    l1->addWidget(&v_label_);
+    l1->addWidget(&linear_speed_box_);
+    l1->addWidget(&w_label_);
+    l1->addWidget(&angular_speed_box_);
+    this->addLayout(l1, 1, 0, 1, -1);
 
     this->addWidget(&bt_q_, 2, 0, 1, 1);
     this->addWidget(&bt_w_, 2, 1, 1, 1);
@@ -83,30 +85,39 @@ void TeleopButton::key_to_button(QEvent *event)
         {
             case(Qt::Key_Q):
                 set_vel('q');
+                bt_q_.setDown(true);
                 break;
             case(Qt::Key_W):
                 set_vel('w');
+                bt_w_.setDown(true);
                 break;
             case(Qt::Key_E):
                 set_vel('e');
+                bt_e_.setDown(true);
                 break;
             case(Qt::Key_A):
                 set_vel('a');
+                bt_a_.setDown(true);
                 break;
             case(Qt::Key_S):
                 set_vel('s');
+                bt_s_.setDown(true);
                 break;
             case(Qt::Key_D):
                 set_vel('d');
+                bt_d_.setDown(true);
                 break;
             case(Qt::Key_Z):
                 set_vel('z');
+                bt_z_.setDown(true);
                 break;
             case(Qt::Key_X):
                 set_vel('x');
+                bt_x_.setDown(true);
                 break;
             case(Qt::Key_C):
                 set_vel('c');
+                bt_c_.setDown(true);
                 break;
         }
     
@@ -114,6 +125,15 @@ void TeleopButton::key_to_button(QEvent *event)
     else if (event->type() == QEvent::KeyRelease)
     {
         set_vel(' ');
+        bt_q_.setDown(false);
+        bt_w_.setDown(false);
+        bt_e_.setDown(false);
+        bt_a_.setDown(false);
+        bt_s_.setDown(false);
+        bt_d_.setDown(false);
+        bt_z_.setDown(false);
+        bt_x_.setDown(false);
+        bt_c_.setDown(false);
     }
 
 }

@@ -44,6 +44,7 @@ public:
   
 protected Q_SLOTS:
   void trigger_service(bool msg, std::string service_name);
+  void set_dog_status(bool msg);
   void set_mode(int mode_id);
   void set_gait(int gait_id);
   void set_height(int height);
@@ -63,6 +64,7 @@ private:
   QString icon_off_path_;
   TeleopButton* teleop_button_;
   SwitchButton* camera_switch_button_;
+  SwitchButton* dog_switch_button_;
   QPushButton* stand_up_button_;
   QPushButton* get_down_button_;
   QLabel* label_;
@@ -70,7 +72,7 @@ private:
   QSlider* height_slider_;
   
   std::string srv_name_camera_ = "camera/enable";
-  std::string dogs_namespace_ = "/mi1046017/";
+  std::string dogs_namespace_ = "/mi123456789/";
 };
 
 } //namespace cyberdog_rviz2_control_plugin
