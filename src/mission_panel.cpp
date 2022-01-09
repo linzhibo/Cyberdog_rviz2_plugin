@@ -47,7 +47,7 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   // teleop_group_box->setLayout(teleop_button_);
 
   height_slider_ = new QSlider(Qt::Vertical);
-  height_slider_->setMinimum(20);
+  height_slider_->setMinimum(10);
   height_slider_->setMaximum(40);
   height_slider_->setValue(30);
   QHBoxLayout* teleop_layout = new QHBoxLayout;
@@ -89,7 +89,12 @@ void MissionPanel::set_dog_status(bool msg)
 
 void MissionPanel::set_height(int height)
 {
-  std::cout<<height<<std::endl;
+  motion_msgs::msg::Parameters param;
+  param.gait_height = 0.8;
+  param.body_height = (float)height/100.0;
+  param.timestamp = dummy_node_->now();;
+  para_pub_->publish(param);
+  // std::cout<<param.body_height <<std::endl;
 }
 
 void MissionPanel::discover_dogs_ns()
@@ -115,7 +120,7 @@ void MissionPanel::discover_dogs_ns()
 
 void MissionPanel::set_gait(int gait_id)
 {
-  std::cout<< gait_id<< std::endl;
+  // std::cout<< gait_id<< std::endl;
 
   auto goal = motion_msgs::action::ChangeGait::Goal();
   goal.motivation = 253;
