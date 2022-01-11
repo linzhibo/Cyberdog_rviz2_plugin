@@ -5,7 +5,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-#include "motion_msgs/action/change_gait.hpp"
+#include "motion_msgs/msg/gait.hpp"
 
 class GaitComboBox : public QHBoxLayout
 {

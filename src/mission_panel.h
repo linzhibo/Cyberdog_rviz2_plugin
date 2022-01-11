@@ -28,6 +28,7 @@
 #include "switch.h"
 #include "teleop_button.h"
 #include "gait_combo_box.h"
+#include "order_combo_box.h"
 
 class QLineEdit;
 namespace cyberdog_rviz2_control_plugin
@@ -48,6 +49,8 @@ protected Q_SLOTS:
   void set_mode(int mode_id);
   void set_gait(int gait_id);
   void set_height(int height);
+  void set_order_id(int order_id);
+  void send_order();
 
 protected:
   bool event(QEvent *event);
@@ -58,6 +61,7 @@ private:
 
   rclcpp_action::Client<motion_msgs::action::ChangeMode>::SharedPtr mode_client_;
   rclcpp_action::Client<motion_msgs::action::ChangeGait>::SharedPtr gait_client_;
+  rclcpp_action::Client<motion_msgs::action::ExtMonOrder>::SharedPtr order_client_;
   rclcpp::Publisher<motion_msgs::msg::Parameters>::SharedPtr para_pub_;
 
   QString icon_on_path_;
@@ -67,12 +71,15 @@ private:
   SwitchButton* dog_switch_button_;
   QPushButton* stand_up_button_;
   QPushButton* get_down_button_;
+  QPushButton* dance_button_;
   QLabel* label_;
   GaitComboBox* gait_list_;
+  OrderComboBox* order_list_;
   QSlider* height_slider_;
   
   std::string srv_name_camera_ = "camera/enable";
   std::string dogs_namespace_ = "/mi123456789/";
+  int order_id_ = 0;
 };
 
 } //namespace cyberdog_rviz2_control_plugin

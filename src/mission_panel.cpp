@@ -14,6 +14,7 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
 
   mode_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeMode>(dummy_node_, dogs_namespace_ + "checkout_mode");
   gait_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeGait>(dummy_node_, dogs_namespace_ + "checkout_gait");
+  order_client_ = rclcpp_action::create_client<motion_msgs::action::ExtMonOrder>(dummy_node_, dogs_namespace_ + "exe_monorder");
   para_pub_ = dummy_node_->create_publisher<motion_msgs::msg::Parameters>(dogs_namespace_ + "para_change", rclcpp::SensorDataQoS());
 
   //interface 
@@ -33,13 +34,17 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   stand_up_button_->setEnabled(false);
   get_down_button_ = new QPushButton("Get Down");
   get_down_button_->setEnabled(false);
+  dance_button_ = new QPushButton("Order");
+  dance_button_->setEnabled(false);
 
   mode_box_layout->addWidget(dog_switch_button_);
   mode_box_layout->addWidget(stand_up_button_);
   mode_box_layout->addWidget(get_down_button_);
+
   // mode_box_layout->addWidget(camera_switch_button_);
 
   gait_list_ = new GaitComboBox(this);
+  order_list_ = new OrderComboBox(this);
 
     //teleop layout
   QGroupBox *teleop_group_box = new QGroupBox(tr("🕹 Teleop layout"));
@@ -57,6 +62,7 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   
   //main layout
   layout->addLayout( mode_box_layout );
+  layout->addLayout( order_list_ );
   layout->addLayout( gait_list_ );
   layout->addWidget( teleop_group_box );
   setLayout( layout );
@@ -66,7 +72,23 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   connect(gait_list_,SIGNAL(valueChanged(int)),SLOT(set_gait(int)));
   connect(stand_up_button_, &QPushButton::clicked, [this](void) { set_mode(1); });
   connect(get_down_button_, &QPushButton::clicked, [this](void) { set_mode(0); });
+  connect(dance_button_, &QPushButton::clicked, [this](void) { send_order(); });
   connect(height_slider_,SIGNAL(valueChanged(int)),SLOT(set_height(int)));
+  connect(order_list_,SIGNAL(valueChanged(int)),SLOT(set_order_id(int)));
+}
+
+void MissionPanel::set_order_id(int order_id)
+{
+  order_id_ = order_id;
+}
+
+void MissionPanel::send_order()
+{
+  auto goal = motion_msgs::action::ExtMonOrder::Goal();
+  goal.orderstamped.timestamp = dummy_node_->get_clock()->now();
+  goal.orderstamped.id = order_id_;
+  goal.orderstamped.para = 0.0;
+  auto goal_handle = order_client_->async_send_goal(goal);
 }
 
 void MissionPanel::set_dog_status(bool msg)
@@ -77,6 +99,8 @@ void MissionPanel::set_dog_status(bool msg)
     label_->setPixmap(QPixmap(icon_on_path_));
     stand_up_button_->setEnabled(true);
     get_down_button_->setEnabled(true);
+    dance_button_->setEnabled(true);
+    
   }
   else
   {
@@ -84,6 +108,7 @@ void MissionPanel::set_dog_status(bool msg)
     label_->setPixmap(QPixmap(icon_off_path_));
     stand_up_button_->setEnabled(false);
     get_down_button_->setEnabled(false);
+    dance_button_->setEnabled(false);
   }
 }
 
