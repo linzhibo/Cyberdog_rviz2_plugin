@@ -6,6 +6,7 @@ OrderComboBox::OrderComboBox(QWidget*): QHBoxLayout()
     order_list_->addItem(" ");
     order_list_->addItem("STAND_UP");
     order_list_->addItem("PROSTRATE");
+    order_list_->addItem("STEP_BACK");
     order_list_->addItem("TURN_AROUND");
     order_list_->addItem("HI_FIVE");
     order_list_->addItem("DANCE");

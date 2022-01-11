@@ -40,6 +40,7 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   mode_box_layout->addWidget(dog_switch_button_);
   mode_box_layout->addWidget(stand_up_button_);
   mode_box_layout->addWidget(get_down_button_);
+  mode_box_layout->addWidget(dance_button_);
 
   // mode_box_layout->addWidget(camera_switch_button_);
 

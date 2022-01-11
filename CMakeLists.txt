@@ -35,6 +35,7 @@ add_library(${PROJECT_NAME} SHARED
             src/switch.cpp
             src/teleop_button.cpp
             src/gait_combo_box.cpp
+            src/order_combo_box.cpp
 )
 
 # Link ament packages
