@@ -12,11 +12,16 @@ GaitComboBox::GaitComboBox(QWidget*): QHBoxLayout()
     gait_list_->addItem("GAIT_BOUND");
     gait_list_->addItem("GAIT_PRONK");
 
-    QLabel* gait_label = new QLabel("Gait: ");
-    gait_label->setFixedWidth(40);
-    this->addWidget(gait_label, Qt::AlignLeft);
+    QLabel* gait_label = new QLabel("🐾  Gait: ");
+    QSizePolicy spLeft(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    spLeft.setHorizontalStretch(1);
+    gait_label->setSizePolicy(spLeft);
+    this->addWidget(gait_label);
 
-    gait_list_->setFixedWidth(150);
+    QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    spRight.setHorizontalStretch(1);
+    gait_list_->setSizePolicy(spRight);
+
     this->addWidget(gait_list_);
 
     connect(gait_list_ ,SIGNAL(currentIndexChanged(int)), SLOT(reemit_signal(int)));

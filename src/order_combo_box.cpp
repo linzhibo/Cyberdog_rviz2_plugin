@@ -15,14 +15,21 @@ OrderComboBox::OrderComboBox(QWidget*): QHBoxLayout()
     order_list_->addItem("SIT");
     order_list_->addItem("SHOW");
 
-    QLabel* order_label = new QLabel("Order: ");
-    order_label->setFixedWidth(40);
-    this->addWidget(order_label, Qt::AlignLeft);
+    QLabel* order_label = new QLabel("⌘  Order: ");
+    QSizePolicy sp(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    sp.setHorizontalStretch(1);
+    order_label->setSizePolicy(sp);
+    this->addWidget(order_label);
 
-    order_list_->setFixedWidth(80);
+    order_list_->setSizePolicy(sp);
     this->addWidget(order_list_);
 
+    order_button_ = new QPushButton("Execute");
+    order_button_->setSizePolicy(sp);
+    this->addWidget(order_button_);
+
     connect(order_list_ ,SIGNAL(currentIndexChanged(int)), SLOT(reemit_signal(int)));
+    connect(order_button_, &QPushButton::clicked, [this](void) { Q_EMIT clicked(); });
 }
 
 OrderComboBox::~OrderComboBox(){}

@@ -20,6 +20,7 @@
 #include <QTimer>
 #include <QPixmap>
 
+#include "interaction_msgs/action/audio_play.hpp"
 #include "motion_msgs/action/change_mode.hpp"
 #include "motion_msgs/action/change_gait.hpp"
 #include "motion_msgs/action/ext_mon_order.hpp"
@@ -59,6 +60,7 @@ private:
   void discover_dogs_ns();
   std::shared_ptr<DummyNode> dummy_node_;
 
+  rclcpp_action::Client<interaction_msgs::action::AudioPlay>::SharedPtr audio_client_;
   rclcpp_action::Client<motion_msgs::action::ChangeMode>::SharedPtr mode_client_;
   rclcpp_action::Client<motion_msgs::action::ChangeGait>::SharedPtr gait_client_;
   rclcpp_action::Client<motion_msgs::action::ExtMonOrder>::SharedPtr order_client_;
@@ -71,7 +73,6 @@ private:
   SwitchButton* dog_switch_button_;
   QPushButton* stand_up_button_;
   QPushButton* get_down_button_;
-  QPushButton* dance_button_;
   QLabel* label_;
   GaitComboBox* gait_list_;
   OrderComboBox* order_list_;

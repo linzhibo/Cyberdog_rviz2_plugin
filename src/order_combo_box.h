@@ -4,6 +4,8 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPushButton>
+#include <QSizePolicy>
 
 #include "motion_msgs/msg/mon_order.hpp"
 
@@ -17,12 +19,14 @@ public:
 
 Q_SIGNALS:
     void valueChanged(int newvalue);
+    bool clicked();
 
 private Q_SLOTS:
     void reemit_signal(int index);
 
 private:
     QComboBox* order_list_;
+    QPushButton* order_button_;
 };
 
 #endif

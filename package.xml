@@ -21,6 +21,7 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_action</depend>
   <depend>motion_msgs</depend>
+  <depend>interaction_msgs</depend>
   <depend>resource_retriever</depend>
   <depend>rviz_common</depend>
   <depend>rviz_rendering</depend>

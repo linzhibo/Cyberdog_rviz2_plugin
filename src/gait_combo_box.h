@@ -4,6 +4,7 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QSizePolicy>
 
 #include "motion_msgs/msg/gait.hpp"
 
