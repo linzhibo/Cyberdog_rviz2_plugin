@@ -71,9 +71,9 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   
   //main layout
   layout->addLayout( mode_box_layout );
-  layout->addLayout( order_list_, Qt::AlignLeft);
   layout->addLayout( gait_list_, Qt::AlignLeft);
-  layout->addLayout( wav_layout );
+  layout->addLayout( order_list_, Qt::AlignLeft);
+  // layout->addLayout( wav_layout );
   layout->addWidget( teleop_group_box );
   setLayout( layout );
 
@@ -115,23 +115,23 @@ void MissionPanel::send_order()
   goal.orderstamped.para = 0.0;
   auto goal_handle = order_client_->async_send_goal(goal);
 
-  if (order_id_ == motion_msgs::msg::MonOrder::MONO_ORDER_DANCE)
-  {
-    std::cout<<"send_order: "<< order_id_ <<std::endl;
-    auto audio_goal = interaction_msgs::action::AudioPlay::Goal();
-    audio_goal.order.name.id = 666;
-    audio_goal.order.user.id = 4;
-    auto audio_goal_handle = audio_client_->async_send_goal(audio_goal);
-  }
+  // if (order_id_ == motion_msgs::msg::MonOrder::MONO_ORDER_DANCE)
+  // {
+  //   std::cout<<"send_order: "<< order_id_ <<std::endl;
+  //   auto audio_goal = interaction_msgs::action::AudioPlay::Goal();
+  //   audio_goal.order.name.id = 888;
+  //   audio_goal.order.user.id = 4;
+  //   auto audio_goal_handle = audio_client_->async_send_goal(audio_goal);
+  // }
 
-  if (order_id_ == motion_msgs::msg::MonOrder::MONO_ORDER_SHOW)
-  {
-    std::cout<<"send_order: "<< order_id_ <<std::endl;
-    auto audio_goal = interaction_msgs::action::AudioPlay::Goal();
-    audio_goal.order.name.id = 204;
-    audio_goal.order.user.id = 4;
-    auto audio_goal_handle = audio_client_->async_send_goal(audio_goal);
-  }
+  // if (order_id_ == motion_msgs::msg::MonOrder::MONO_ORDER_SHOW)
+  // {
+  //   std::cout<<"send_order: "<< order_id_ <<std::endl;
+  //   auto audio_goal = interaction_msgs::action::AudioPlay::Goal();
+  //   audio_goal.order.name.id = 666;
+  //   audio_goal.order.user.id = 4;
+  //   auto audio_goal_handle = audio_client_->async_send_goal(audio_goal);
+  // }
 }
 
 void MissionPanel::set_dog_status(bool msg)
