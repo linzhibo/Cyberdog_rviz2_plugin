@@ -44,6 +44,18 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   // gait layout
   gait_list_ = new GaitComboBox(this);
 
+  // wav_input layout
+  QHBoxLayout* wav_layout = new QHBoxLayout;
+  QLabel* void_label = new QLabel("🎵  Music:");
+  wav_layout->addWidget(void_label);
+  wav_input_ = new QLineEdit(this);
+  wav_input_->setFixedWidth(80);
+  wav_input_->setValidator( new QIntValidator(0, 999, this) );
+  wav_layout->addWidget(wav_input_);
+  play_button_ = new QPushButton("Play");
+  play_button_->setFixedWidth(80);
+  wav_layout->addWidget(play_button_);
+
   // teleop layout
   QGroupBox *teleop_group_box = new QGroupBox(tr("🕹  Teleop layout"));
   teleop_button_ = new TeleopButton(this);
@@ -61,6 +73,7 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   layout->addLayout( mode_box_layout );
   layout->addLayout( order_list_, Qt::AlignLeft);
   layout->addLayout( gait_list_, Qt::AlignLeft);
+  layout->addLayout( wav_layout );
   layout->addWidget( teleop_group_box );
   setLayout( layout );
 
@@ -71,6 +84,22 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   connect(height_slider_,SIGNAL(valueChanged(int)),SLOT(set_height(int)));
   connect(order_list_,SIGNAL(valueChanged(int)),SLOT(set_order_id(int)));
   connect(order_list_, &OrderComboBox::clicked, [this](void) { send_order(); });
+  connect(wav_input_, SIGNAL(editingFinished()), this, SLOT( set_wav_id()) );
+  connect(play_button_, &QPushButton::clicked, [this](void) { play_wav(); });
+}
+
+void MissionPanel::play_wav()
+{
+  std::cout<<"playing: "<< wav_id_ <<std::endl;
+  auto audio_goal = interaction_msgs::action::AudioPlay::Goal();
+  audio_goal.order.name.id = wav_id_;
+  audio_goal.order.user.id = 4;
+  auto audio_goal_handle = audio_client_->async_send_goal(audio_goal); 
+}
+
+void MissionPanel::set_wav_id()
+{
+  wav_id_ = wav_input_->text().toInt(); 
 }
 
 void MissionPanel::set_order_id(int order_id)

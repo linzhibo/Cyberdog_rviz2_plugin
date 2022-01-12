@@ -52,6 +52,8 @@ protected Q_SLOTS:
   void set_height(int height);
   void set_order_id(int order_id);
   void send_order();
+  void set_wav_id();
+  void play_wav();
 
 protected:
   bool event(QEvent *event);
@@ -77,10 +79,13 @@ private:
   GaitComboBox* gait_list_;
   OrderComboBox* order_list_;
   QSlider* height_slider_;
+  QLineEdit* wav_input_;
+  QPushButton* play_button_;
   
   std::string srv_name_camera_ = "camera/enable";
   std::string dogs_namespace_ = "/mi123456789/";
   int order_id_ = 0;
+  int wav_id_ = 0;
 };
 
 } //namespace cyberdog_rviz2_control_plugin
