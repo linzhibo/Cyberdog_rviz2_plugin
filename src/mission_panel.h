@@ -21,6 +21,7 @@
 #include <QPixmap>
 
 #include "interaction_msgs/action/audio_play.hpp"
+#include "interaction_msgs/srv/token_pass.hpp"
 #include "motion_msgs/action/change_mode.hpp"
 #include "motion_msgs/action/change_gait.hpp"
 #include "motion_msgs/action/ext_mon_order.hpp"
@@ -54,6 +55,7 @@ protected Q_SLOTS:
   void send_order();
   void set_wav_id();
   void play_wav();
+  void set_volume(int vol);
 
 protected:
   bool event(QEvent *event);
@@ -63,6 +65,7 @@ private:
   std::shared_ptr<DummyNode> dummy_node_;
 
   rclcpp_action::Client<interaction_msgs::action::AudioPlay>::SharedPtr audio_client_;
+  rclcpp::Client<interaction_msgs::srv::TokenPass>::SharedPtr token_pass_service_;
   rclcpp_action::Client<motion_msgs::action::ChangeMode>::SharedPtr mode_client_;
   rclcpp_action::Client<motion_msgs::action::ChangeGait>::SharedPtr gait_client_;
   rclcpp_action::Client<motion_msgs::action::ExtMonOrder>::SharedPtr order_client_;
@@ -76,6 +79,7 @@ private:
   QPushButton* stand_up_button_;
   QPushButton* get_down_button_;
   QLabel* label_;
+  QLabel* height_label_;
   GaitComboBox* gait_list_;
   OrderComboBox* order_list_;
   QSlider* height_slider_;

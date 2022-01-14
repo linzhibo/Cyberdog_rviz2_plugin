@@ -17,7 +17,7 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   gait_client_ = rclcpp_action::create_client<motion_msgs::action::ChangeGait>(dummy_node_, dogs_namespace_ + "checkout_gait");
   order_client_ = rclcpp_action::create_client<motion_msgs::action::ExtMonOrder>(dummy_node_, dogs_namespace_ + "exe_monorder");
   para_pub_ = dummy_node_->create_publisher<motion_msgs::msg::Parameters>(dogs_namespace_ + "para_change", rclcpp::SensorDataQoS());
-
+  token_pass_service_ = dummy_node_->create_client<interaction_msgs::srv::TokenPass>(dogs_namespace_ +"token_update");
   //interface 
   QVBoxLayout* layout = new QVBoxLayout;
   QHBoxLayout* mode_box_layout = new QHBoxLayout;
@@ -48,6 +48,14 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   QHBoxLayout* wav_layout = new QHBoxLayout;
   QLabel* void_label = new QLabel("🎵  Music:");
   wav_layout->addWidget(void_label);
+
+  QSlider* vol_slider = new QSlider(Qt::Horizontal);
+  vol_slider->setMinimum(0);
+  vol_slider->setMaximum(10);
+  vol_slider->setValue(5);
+  vol_slider->setFixedWidth(60);
+  wav_layout->addWidget(vol_slider);
+
   wav_input_ = new QLineEdit(this);
   wav_input_->setFixedWidth(80);
   wav_input_->setValidator( new QIntValidator(0, 999, this) );
@@ -59,21 +67,26 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   // teleop layout
   QGroupBox *teleop_group_box = new QGroupBox(tr("🕹  Teleop layout"));
   teleop_button_ = new TeleopButton(this);
+  
   height_slider_ = new QSlider(Qt::Vertical);
   height_slider_->setMinimum(10);
   height_slider_->setMaximum(40);
   height_slider_->setValue(30);
+  height_label_ = new QLabel(QString::number(30));
+  QVBoxLayout* height_layout = new QVBoxLayout;
+  height_layout->addWidget(height_label_);
+  height_layout->addWidget(height_slider_);
 
   QHBoxLayout* teleop_layout = new QHBoxLayout;
   teleop_layout->addLayout(teleop_button_);
-  teleop_layout->addWidget(height_slider_);
+  teleop_layout->addLayout(height_layout);
   teleop_group_box->setLayout(teleop_layout);
   
   //main layout
   layout->addLayout( mode_box_layout );
   layout->addLayout( gait_list_, Qt::AlignLeft);
   layout->addLayout( order_list_, Qt::AlignLeft);
-  // layout->addLayout( wav_layout );
+  layout->addLayout( wav_layout );
   layout->addWidget( teleop_group_box );
   setLayout( layout );
 
@@ -86,6 +99,16 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   connect(order_list_, &OrderComboBox::clicked, [this](void) { send_order(); });
   connect(wav_input_, SIGNAL(editingFinished()), this, SLOT( set_wav_id()) );
   connect(play_button_, &QPushButton::clicked, [this](void) { play_wav(); });
+  connect(vol_slider, SIGNAL(valueChanged(int)), SLOT(set_volume(int)));
+}
+
+void MissionPanel::set_volume(int vol)
+{
+  std::cout<< "set volume to: "<< vol << std::endl;
+  auto request = std::make_shared<interaction_msgs::srv::TokenPass::Request>();
+  request->ask = request->ASK_SET_VOLUME;
+  request->vol = vol;
+  auto result = token_pass_service_->async_send_request(request);
 }
 
 void MissionPanel::play_wav()
@@ -160,7 +183,7 @@ void MissionPanel::set_height(int height)
   param.body_height = (float)height/100.0;
   param.timestamp = dummy_node_->now();;
   para_pub_->publish(param);
-  // std::cout<<param.body_height <<std::endl;
+  height_label_->setText(QString::number(height));
 }
 
 void MissionPanel::discover_dogs_ns()

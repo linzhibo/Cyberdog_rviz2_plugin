@@ -2,7 +2,7 @@
 
 ## Preview
 
-![preview](readme_pics/preview.gif)
+![preview](readme_pics/preview.png?raw=true)
 
 ## dependencies 
 Make sure motion_msgs from cyberdog repo is installed, and use cyclonedds for service call between machines
@@ -19,4 +19,4 @@ rviz2
  Panels -> Add new panel -> mission panel
 
  ## Cyberdog icon creator credit
- ![Icon creator](readme_pics/icon_creator.jpg)
+ ![Icon creator](readme_pics/icon_creator.jpg?raw=true)
