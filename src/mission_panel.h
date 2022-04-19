@@ -22,6 +22,7 @@
 
 #include "interaction_msgs/action/audio_play.hpp"
 #include "interaction_msgs/srv/token_pass.hpp"
+#include "interaction_msgs/srv/camera_service.hpp"
 #include "motion_msgs/action/change_mode.hpp"
 #include "motion_msgs/action/change_gait.hpp"
 #include "motion_msgs/action/ext_mon_order.hpp"
@@ -56,6 +57,8 @@ protected Q_SLOTS:
   void set_wav_id();
   void play_wav();
   void set_volume(int vol);
+  void set_t2s_text();
+  void play_t2s();
 
 protected:
   bool event(QEvent *event);
@@ -70,6 +73,7 @@ private:
   rclcpp_action::Client<motion_msgs::action::ChangeGait>::SharedPtr gait_client_;
   rclcpp_action::Client<motion_msgs::action::ExtMonOrder>::SharedPtr order_client_;
   rclcpp::Publisher<motion_msgs::msg::Parameters>::SharedPtr para_pub_;
+  rclcpp::Client<interaction_msgs::srv::CameraService>::SharedPtr t2s_service_;
 
   QString icon_on_path_;
   QString icon_off_path_;
@@ -83,13 +87,14 @@ private:
   GaitComboBox* gait_list_;
   OrderComboBox* order_list_;
   QSlider* height_slider_;
-  QLineEdit* wav_input_;
-  QPushButton* play_button_;
+  QLineEdit* wav_input_, *text_input_;
+  QPushButton* play_button_, *t2s_button_;
   
   std::string srv_name_camera_ = "camera/enable";
   std::string dogs_namespace_ = "/mi123456789/";
   int order_id_ = 0;
   int wav_id_ = 0;
+  std::string text_ready_to_speech_ = "";
 };
 
 } //namespace cyberdog_rviz2_control_plugin

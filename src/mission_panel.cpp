@@ -18,6 +18,8 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   order_client_ = rclcpp_action::create_client<motion_msgs::action::ExtMonOrder>(dummy_node_, dogs_namespace_ + "exe_monorder");
   para_pub_ = dummy_node_->create_publisher<motion_msgs::msg::Parameters>(dogs_namespace_ + "para_change", rclcpp::SensorDataQoS());
   token_pass_service_ = dummy_node_->create_client<interaction_msgs::srv::TokenPass>(dogs_namespace_ +"token_update");
+  t2s_service_ = dummy_node_->create_client<interaction_msgs::srv::CameraService>("text_to_sound");
+
   //interface 
   QVBoxLayout* layout = new QVBoxLayout;
   QHBoxLayout* mode_box_layout = new QHBoxLayout;
@@ -64,6 +66,14 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   play_button_->setFixedWidth(80);
   wav_layout->addWidget(play_button_);
 
+  // text input layout
+  QHBoxLayout* t2s_layout = new QHBoxLayout;
+  text_input_ = new QLineEdit(this);
+  t2s_layout->addWidget(text_input_);
+  t2s_button_ = new QPushButton("Text to speech");
+  t2s_button_->setFixedWidth(100);
+  t2s_layout->addWidget(t2s_button_);
+
   // teleop layout
   QGroupBox *teleop_group_box = new QGroupBox(tr("🕹  Teleop layout"));
   teleop_button_ = new TeleopButton(this);
@@ -87,6 +97,7 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   layout->addLayout( gait_list_, Qt::AlignLeft);
   layout->addLayout( order_list_, Qt::AlignLeft);
   layout->addLayout( wav_layout );
+  layout->addLayout( t2s_layout );
   layout->addWidget( teleop_group_box );
   setLayout( layout );
 
@@ -100,6 +111,49 @@ MissionPanel::MissionPanel(QWidget* parent):rviz_common::Panel(parent)
   connect(wav_input_, SIGNAL(editingFinished()), this, SLOT( set_wav_id()) );
   connect(play_button_, &QPushButton::clicked, [this](void) { play_wav(); });
   connect(vol_slider, SIGNAL(valueChanged(int)), SLOT(set_volume(int)));
+  connect(text_input_, SIGNAL(editingFinished()), this, SLOT( set_t2s_text()) );
+  connect(t2s_button_, &QPushButton::clicked, [this](void) { play_t2s(); });
+}
+
+void MissionPanel::play_t2s()
+{
+  if (text_ready_to_speech_ == "")
+    return;
+
+  auto request = std::make_shared<interaction_msgs::srv::CameraService::Request>();
+  request->args = text_ready_to_speech_;
+  auto result =t2s_service_->async_send_request(request);
+
+  if (rclcpp::spin_until_future_complete(dummy_node_, result) ==rclcpp::FutureReturnCode::SUCCESS)
+  {
+    if(result.get()->result == 1)
+    {
+      std::cout<<"text to speech service successful, playing now: "<< text_ready_to_speech_<<std::endl;
+      auto audio_goal = interaction_msgs::action::AudioPlay::Goal();
+      audio_goal.order.name.id = 777;
+      audio_goal.order.user.id = 4;
+      auto audio_goal_handle = audio_client_->async_send_goal(audio_goal); 
+    }
+  } 
+  else 
+  {
+    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service t2s");
+  }
+  
+  // if(response.get()->result)
+  // {
+  //   std::cout<<"response.result: "<< response.get()->result <<std::endl;
+  //   std::cout<<"playing: "<< text_ready_to_speech_ <<std::endl;
+    // auto audio_goal = interaction_msgs::action::AudioPlay::Goal();
+    // audio_goal.order.name.id = 777;
+    // audio_goal.order.user.id = 4;
+    // auto audio_goal_handle = audio_client_->async_send_goal(audio_goal); 
+  // }
+}
+
+void MissionPanel::set_t2s_text()
+{
+  text_ready_to_speech_ = text_input_->text().toStdString(); 
 }
 
 void MissionPanel::set_volume(int vol)
