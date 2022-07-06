@@ -19,7 +19,7 @@ rviz2
  Panels -> Add new panel -> mission panel
  
 ## Video Demo
-https://www.bilibili.com/video/BV1ML4y1b78d?spm_id_from=333.999.0.0
+https://www.bilibili.com/video/BV1ML4y1b78d
 
 ## Cyberdog icon creator credit
 ![Icon creator](readme_pics/icon_creator.jpg?raw=true)
